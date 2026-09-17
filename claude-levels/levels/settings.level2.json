@@ -1,0 +1,157 @@
+{
+  "//": "Level 2 -- Assisted. Reading and inspection are free; anything that writes still prompts.",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote:*)",
+      "Bash(ls:*)",
+      "Bash(pwd)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "Bash(sed -n:*)",
+      "Bash(which:*)",
+      "Bash(file:*)",
+      "Bash(tree:*)",
+      "Bash(du:*)",
+      "Bash(df:*)",
+      "Bash(echo:*)",
+      "Bash(date:*)",
+      "Bash(jq:*)",
+      "Bash(diff:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(/bin/rm:*)",
+      "Bash(command rm:*)",
+      "Bash(sudo rm:*)",
+      "Bash(sudo shutdown:*)",
+      "Bash(sudo reboot:*)",
+      "Bash(mkfs:*)",
+      "Bash(dd if=:*)",
+      "Bash(chmod -R 777:*)",
+      "Bash(git push -f:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(pkill -f:*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/*credentials*.json)",
+      "Read(**/token.json)",
+      "Read(**/id_rsa)",
+      "Read(**/.aws/**)",
+      "Read(**/.ssh/**)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(npm publish:*)",
+      "Bash(gh repo create:*)"
+    ],
+    "defaultMode": "default"
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/.claude/hooks/check-unpaired-surrogates.py\" --userpromptsubmit",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/.claude/hooks/check-unpaired-surrogates.py\" --pretooluse",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/.claude/hooks/danger-guard.py\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/.claude/hooks/danger-guard.py\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/.claude/hooks/shared-config-guard.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/.claude/hooks/shared-config-guard.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "manual",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.claude/hooks/precompact-backup.sh\"",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.claude/hooks/precompact-backup.sh\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "\"$HOME/.claude/statusline.sh\"",
+    "padding": 0
+  }
+}
